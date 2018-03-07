@@ -1,0 +1,175 @@
+<head>
+  <title>Login Page</title>
+  <script src="https://cdn.auth0.com/js/auth0/9.3.1/auth0.min.js"></script>
+</head>
+
+<script>
+  window.addEventListener('load', function () {
+
+    var webAuth = new auth0.WebAuth({
+      domain: 'lbdemo.eu.auth0.com',
+      clientID: 'VcP4dN0uPUmU77Y5MlnJMuRqVANzzc6R',
+      responseType: 'token id_token',
+      audience: 'http://localhost:3000',
+      scope: 'openid',
+      redirectUri: window.location.href
+    });
+
+    var loginBtn = document.getElementById('btn-login');
+
+    loginBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      webAuth.authorize();
+    });
+
+    // ...
+    var loginStatus = document.querySelector('.container h4');
+    var loginView = document.getElementById('login-view');
+    var homeView = document.getElementById('home-view');
+
+    // buttons and event listeners
+    var homeViewBtn = document.getElementById('btn-home-view');
+    var loginBtn = document.getElementById('btn-login');
+    var logoutBtn = document.getElementById('btn-logout');
+
+    homeViewBtn.addEventListener('click', function () {
+      homeView.style.display = 'inline-block';
+      loginView.style.display = 'none';
+    });
+
+    logoutBtn.addEventListener('click', logout);
+
+    function handleAuthentication() {
+      webAuth.parseHash(function (err, authResult) {
+
+
+        if (authResult && authResult.accessToken && authResult.idToken) {
+          window.location.hash = '';
+          setSession(authResult);
+          loginBtn.style.display = 'none';
+          homeView.style.display = 'inline-block';
+        } else if (err) {
+          homeView.style.display = 'inline-block';
+          alert(
+            'Error: ' + err.error + '. Check the console for further details.'
+          );
+        }
+        displayButtons();
+      });
+    }
+
+    function setSession(authResult) {
+      // Set the time that the Access Token will expire at
+      var expiresAt = JSON.stringify(
+        authResult.expiresIn * 1000 + new Date().getTime()
+      );
+
+      console.log('************ authResult:', authResult);
+
+      localStorage.setItem('access_token', authResult.accessToken);
+      localStorage.setItem('id_token', authResult.idToken);
+      localStorage.setItem('expires_at', expiresAt);
+    }
+
+    function logout() {
+      // Remove tokens and expiry time from localStorage
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('id_token');
+      localStorage.removeItem('expires_at');
+      displayButtons();
+    }
+
+    function isAuthenticated() {
+      // Check whether the current time is past the
+      // Access Token's expiry time
+      var expiresAt = JSON.parse(localStorage.getItem('expires_at'));
+      return new Date().getTime() < expiresAt;
+    }
+
+    function displayButtons() {
+      if (isAuthenticated()) {
+        loginBtn.style.display = 'none';
+        logoutBtn.style.display = 'inline-block';
+        loginStatus.innerHTML = 'You are logged in!';
+      } else {
+        loginBtn.style.display = 'inline-block';
+        logoutBtn.style.display = 'none';
+        loginStatus.innerHTML =
+          'You are not logged in! Please log in to continue.';
+      }
+    }
+
+    handleAuthentication();
+
+
+    document.getElementById('api-request-article').addEventListener('click', function () {
+      var xmlHttp = new XMLHttpRequest();
+
+      xmlHttp.onreadystatechange = function () {
+        document.getElementById('response-content').innerText = xmlHttp.response;
+
+      };
+      xmlHttp.open("GET", 'http://localhost:3000/api/Articles', true); // true for asynchronous
+      xmlHttp.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('access_token'));
+      // xmlHttp.setRequestHeader('Authorization', 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik5rRTNORFZHUXpnd01FTkZPRU01TkRSRVJFTXhNa00wUVVVeVFqZEROa1k0UmtNMFFUSTRPUSJ9.eyJpc3MiOiJodHRwczovL2xiZGVtby5ldS5hdXRoMC5jb20vIiwic3ViIjoiVmNQNGROMHVQVW1VNzdZNU1sbkpNdVJxVkFOenpjNlJAY2xpZW50cyIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCIsImlhdCI6MTUyMDM1MjI2NCwiZXhwIjoxNTIwNDM4NjY0LCJhenAiOiJWY1A0ZE4wdVBVbVU3N1k1TWxuSk11UnFWQU56emM2UiIsImd0eSI6ImNsaWVudC1jcmVkZW50aWFscyJ9.M352IexQ8yQl8SgQ_IbE_nzsDHlYRb__3o46FO8V5dZrEyIgbuy73hIEruWKfWKDvC0H6rOq5I2jIgkYLYP_uMM0Kx_SDMb-asllr_AFfdDuL1kCFUoATMlDXze4MqdhxpL-1vgKgCOFpKnskzz9lCA2_MIHhFYU05gcMDrJLNXIvspYk0bGxkmFATL5eZsPbFA5qg7gJH_SwxRNLHBTOhrLwkSy2AXpTCLEAnx2lWBbriXxbgLF5tXwGBaNK_ckBcSIAW_7soOPz45wC6vCqcX8A0AR6sa3K7t41EYcIR0U3gF7FJlHzUvXpW5ShpLLzf4xpAPuPYIpqFErwHs6YA');
+      xmlHttp.send(null);
+    });
+
+    document.getElementById('api-request-secret').addEventListener('click', function () {
+      var xmlHttp = new XMLHttpRequest();
+
+      xmlHttp.onreadystatechange = function () {
+        document.getElementById('response-content').innerText = xmlHttp.response;
+
+      };
+      xmlHttp.open("GET", 'http://localhost:3000/api/Secrets', true); // true for asynchronous
+      xmlHttp.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('access_token'));
+      // xmlHttp.setRequestHeader('Authorization', 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik5rRTNORFZHUXpnd01FTkZPRU01TkRSRVJFTXhNa00wUVVVeVFqZEROa1k0UmtNMFFUSTRPUSJ9.eyJpc3MiOiJodHRwczovL2xiZGVtby5ldS5hdXRoMC5jb20vIiwic3ViIjoiVmNQNGROMHVQVW1VNzdZNU1sbkpNdVJxVkFOenpjNlJAY2xpZW50cyIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCIsImlhdCI6MTUyMDM1MjI2NCwiZXhwIjoxNTIwNDM4NjY0LCJhenAiOiJWY1A0ZE4wdVBVbVU3N1k1TWxuSk11UnFWQU56emM2UiIsImd0eSI6ImNsaWVudC1jcmVkZW50aWFscyJ9.M352IexQ8yQl8SgQ_IbE_nzsDHlYRb__3o46FO8V5dZrEyIgbuy73hIEruWKfWKDvC0H6rOq5I2jIgkYLYP_uMM0Kx_SDMb-asllr_AFfdDuL1kCFUoATMlDXze4MqdhxpL-1vgKgCOFpKnskzz9lCA2_MIHhFYU05gcMDrJLNXIvspYk0bGxkmFATL5eZsPbFA5qg7gJH_SwxRNLHBTOhrLwkSy2AXpTCLEAnx2lWBbriXxbgLF5tXwGBaNK_ckBcSIAW_7soOPz45wC6vCqcX8A0AR6sa3K7t41EYcIR0U3gF7FJlHzUvXpW5ShpLLzf4xpAPuPYIpqFErwHs6YA');
+      xmlHttp.send(null);
+    })
+  });
+
+
+</script>
+
+<body>
+<h1>Login Page</h1>
+<p>
+
+<div class="content">
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">Auth0 - JavaScript</a>
+
+        <button id="btn-home-view" class="btn btn-primary btn-margin">
+          Home
+        </button>
+
+        <button id="btn-login" class="btn btn-primary btn-margin">
+          Log In
+        </button>
+
+        <button id="btn-logout" class="btn btn-primary btn-margin">
+          Log Out
+        </button>
+
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <h4>API</h4>
+
+    <button id="api-request-article">Get Articles (public)</button>
+    <button id="api-request-secret">Get Secrets (author)</button>
+
+    <pre id="response-content"></pre>
+
+
+  </main>
+
+</div>
+
+</p>
+</body>
