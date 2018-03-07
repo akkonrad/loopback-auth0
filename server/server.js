@@ -4,25 +4,18 @@ var loopback = require('loopback');
 var boot = require('loopback-boot');
 var jwt = require('express-jwt');
 var jwks = require('jwks-rsa');
+var auth0Jwt = require('loopback-auth0-jwt');
 
 var app = module.exports = loopback();
 
-var authCheck = jwt({
-  secret: jwks.expressJwtSecret({
-    cache: true,
-    rateLimit: true,
-    jwksRequestsPerMinute: 5,
-    // YOUR-AUTH0-DOMAIN name e.g https://prosper.auth0.com
-    jwksUri: "https://lbdemo.eu.auth0.com/.well-known/jwks.json"
-  }),
-  // This is the identifier we set when we created the API
-  audience: 'http://localhost:3000',
-  issuer: 'https://lbdemo.eu.auth0.com/',
-  algorithms: ['RS256']
-});
+var authConfig = {
+  secretKey    : process.env.AUTH0_SECRET,
+  model        : 'User'
+};
 
+var auth = auth0Jwt(app, authConfig);
 
-app.use('/api', authCheck);
+app.use('/api', auth.authenticated);
 
 // catch error
 app.use(function (err, req, res, next) {
@@ -51,7 +44,7 @@ app.start = function() {
 // Sub-apps like REST API are mounted via boot scripts.
 boot(app, __dirname, function(err) {
   if (err) throw err;
-
+  
   // start the server if `$ node server.js`
   if (require.main === module)
     app.start();
