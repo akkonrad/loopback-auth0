@@ -42,5 +42,9 @@
   "Secret": {
     "dataSource": "db",
     "public": true
+  },
+  "Mine": {
+    "dataSource": "db",
+    "public": true
   }
 }
