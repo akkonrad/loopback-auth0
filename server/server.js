@@ -9,7 +9,8 @@ var auth0Jwt = require('loopback-auth0-jwt');
 var app = module.exports = loopback();
 
 var authConfig = {
-  secretKey    : process.env.AUTH0_SECRET,
+  // secretKey    : process.env.AUTH0_SECRET,
+  secretKey    : 'hwxVjD8rcog3eWu8pTvcPJtj_463dDhSKlMbqV_GZyoSgCNldZ-GQIyQTO3BhzRM',
   model        : 'User'
 };
 
@@ -44,7 +45,7 @@ app.start = function() {
 // Sub-apps like REST API are mounted via boot scripts.
 boot(app, __dirname, function(err) {
   if (err) throw err;
-  
+
   // start the server if `$ node server.js`
   if (require.main === module)
     app.start();
