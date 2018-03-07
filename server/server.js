@@ -16,7 +16,10 @@ var authConfig = {
 
 var auth = auth0Jwt(app, authConfig);
 
-app.use('/api', auth.authenticated);
+app.use('/api', auth.authenticated, function(req, res, next) {
+  console.log('===========', 'req.accessToken', req.accessToken);
+  next();
+});
 
 // catch error
 app.use(function (err, req, res, next) {
@@ -26,7 +29,6 @@ app.use(function (err, req, res, next) {
     res.status(401).send(err);
   }
 });
-
 
 app.start = function() {
   // start the web server

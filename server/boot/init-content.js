@@ -1,27 +1,29 @@
 'use strict';
 
-module.exports = function(app) {
-  var Article = app.models.Article;
-  var Secret = app.models.Secret;
-  var Mine = app.models.Mine;
+module.exports = function (app) {
 
-  for (var i = 0; i < 3; i++) {
+  app.get('loopback-component-auto-migrate-done').then(function () {
+    var Article = app.models.Article;
+    var Secret = app.models.Secret;
+    var Mine = app.models.Mine;
+
+    console.log('creatind dummy content');
+
     Article.create({
-      title: 'Article #' + Math.round(Math.random() * 1000),
-      userId: 1,
-    }, function(err, article) {
+      title: '(user) Article #' + Math.round(Math.random() * 1000),
+    }, function (err, article) {
     });
 
     Secret.create({
-      title: 'Secret #' + Math.round(Math.random() * 1000),
-      userId: 1,
-    }, function(err, secret) {
+      title: '(user) Secret #' + Math.round(Math.random() * 1000),
+    }, function (err, secret) {
     });
 
     Mine.create({
       power: Math.round(Math.random() * 10000),
-      userId: 1,
-    }, function(err, secret) {
+    }, function (err, secret) {
     });
-  }
+
+    console.log('content created.');
+  });
 };

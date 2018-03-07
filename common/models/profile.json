@@ -1,0 +1,19 @@
+{
+  "name": "Profile",
+  "base": "User",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {},
+  "validations": [],
+  "relations": {
+    "accessTokens": {
+      "type": "hasMany",
+      "model": "AccessToken",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}
