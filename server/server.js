@@ -17,7 +17,9 @@ var authConfig = {
 var auth = auth0Jwt(app, authConfig);
 
 app.use('/api', auth.authenticated, function(req, res, next) {
-  console.log('===========', 'req.accessToken', req.accessToken);
+  console.log('===========');
+  console.log('req.accessToken', req.accessToken);
+  console.log('===========');
   next();
 });
 

@@ -18,7 +18,7 @@
     "helmet": "^3.10.0",
     "jwks-rsa": "^1.2.1",
     "loopback": "^3.0.0",
-    "loopback-auth0-jwt": "^1.0.0",
+    "loopback-auth0-jwt": "git+ssh://git@github.com/Eencsio/loopback-auth0-jwt.git#promisesChange",
     "loopback-boot": "^2.6.5",
     "loopback-component-auto-migrate": "^0.3.0",
     "loopback-component-explorer": "^5.0.0",
