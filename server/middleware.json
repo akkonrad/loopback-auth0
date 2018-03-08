@@ -31,7 +31,14 @@
     }
   },
   "session": {},
-  "auth": {},
+  "auth": {
+    "./middleware/midcheck": {
+      "paths": [
+        "/api"
+      ],
+      "params": {}
+    }
+  },
   "parse": {},
   "routes": {
     "loopback#rest": {
